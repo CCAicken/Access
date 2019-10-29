@@ -1,11 +1,8 @@
 package controller.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.Expression;
 import util.LayuiData;
-import util.ReadExcelUtils;
 import business.dao.CollegeDAO;
 import business.factory.DAOFactory;
 
@@ -74,11 +70,11 @@ public class CollegeController {
 		}
 
 	}
-	
+
 	// 获取所有学院列表
 	@RequestMapping(value = "getallcollege")
-	public void getAllCollegeList(HttpServletRequest request, HttpServletResponse response,
-			Model model) {
+	public void getAllCollegeList(HttpServletRequest request,
+			HttpServletResponse response, Model model) {
 		CollegeDAO cdao = DAOFactory.getCollegeDAO();
 		List<TCollege> collegelist = cdao.select();
 		response.setCharacterEncoding("utf-8");
@@ -196,65 +192,6 @@ public class CollegeController {
 			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	// 批量添加学院
-	@RequestMapping(value = "addcollegelist")
-	public void addcollegeByList(HttpServletRequest request, String path,
-			HttpServletResponse response, Model model) {
-		CollegeDAO cdao = DAOFactory.getCollegeDAO();
-
-		response.setContentType("application/json");
-		response.setCharacterEncoding("utf-8");
-		// 消息提示
-		LayuiData layui = new LayuiData();
-		try {
-			String filepath = path;// 文件路径
-			ReadExcelUtils excelReader = new ReadExcelUtils(filepath);
-
-			// 读取Excel表格内容
-			List<Map<Integer, Object>> list = excelReader.readExcelContent();
-			List<Object> collegelist = new ArrayList<Object>();
-
-			for (Map<Integer, Object> map : list) {
-				TCollege college = new TCollege();
-				for (Map.Entry<Integer, Object> m : map.entrySet()) {
-
-					switch (m.getKey()) {
-					case 0:
-						college.setCollegename((String) m.getValue());
-						break;
-					default:
-						break;
-					}
-				}
-				collegelist.add(college);
-
-			}
-			if (cdao.addcollegeByList(collegelist)) {
-				layui.code = 0;
-				layui.msg = "导入成功";
-			} else {
-				layui.code = 1;
-				layui.msg = "导入错误";
-			}
-			Writer out;
-			try {
-				out = response.getWriter();
-				out.write(JSON.toJSONString(layui));
-				out.flush();
-				out.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (FileNotFoundException e) {
-			System.out.println("未找到指定路径的文件!");
-			e.printStackTrace();
-		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

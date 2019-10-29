@@ -1,11 +1,8 @@
 package controller.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.Expression;
 import util.LayuiData;
-import util.ReadExcelUtils;
-import business.dao.CollegeDAO;
 import business.dao.MajorDAO;
 import business.factory.DAOFactory;
 
@@ -99,7 +94,7 @@ public class MajorController {
 		}
 
 	}
-		
+
 	// 添加专业
 	@RequestMapping(value = "addmajor")
 	public void addcollege(HttpServletRequest request, Integer collegeid,
@@ -198,70 +193,5 @@ public class MajorController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	// 批量添加专业
-	@RequestMapping(value = "addmajorlist")
-	public void addMajorByList(HttpServletRequest request, String path,
-			HttpServletResponse response, Model model) {
-		MajorDAO mdao = DAOFactory.getMajorDAO();
-
-		response.setContentType("application/json");
-		response.setCharacterEncoding("utf-8");
-		// 消息提示
-		LayuiData layui = new LayuiData();
-		try {
-			String filepath = path;// 文件路径
-			ReadExcelUtils excelReader = new ReadExcelUtils(filepath);
-
-			// 读取Excel表格内容
-			List<Map<Integer, Object>> list = excelReader.readExcelContent();
-			List<Object> majorlist = new ArrayList<Object>();
-
-			for (Map<Integer, Object> map : list) {
-				TMajor major = new TMajor();
-				for (Map.Entry<Integer, Object> m : map.entrySet()) {
-
-					switch (m.getKey()) {
-					case 0:
-						CollegeDAO cdao = DAOFactory.getCollegeDAO();
-						Integer collegeid = cdao.getCollegeid((String) m
-								.getValue());
-						major.setCollegeid(collegeid);
-						break;
-					case 1:
-						major.setMajorname((String) m.getValue());
-						break;
-					default:
-						break;
-					}
-				}
-				majorlist.add(major);
-
-			}
-			if (mdao.insertList(majorlist)) {
-				layui.code = 0;
-				layui.msg = "导入成功";
-			} else {
-				layui.code = 1;
-				layui.msg = "导入错误";
-			}
-			Writer out;
-			try {
-				out = response.getWriter();
-				out.write(JSON.toJSONString(layui));
-				out.flush();
-				out.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (FileNotFoundException e) {
-			System.out.println("未找到指定路径的文件!");
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 }

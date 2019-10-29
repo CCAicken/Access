@@ -1,12 +1,8 @@
 package controller.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import util.EnCriptUtil;
 import util.Expression;
 import util.LayuiData;
-import util.ReadExcelUtils;
 import business.dao.AdminUserDAO;
 import business.dao.UserDAO;
 import business.factory.DAOFactory;
@@ -144,98 +139,6 @@ public class UserController {
 			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	// 批量添加用户
-	@RequestMapping(value = "adduserlist")
-	public void addUserByList(HttpServletRequest request, String path,
-			HttpServletResponse response, Model model) {
-		UserDAO udao = DAOFactory.getUserDAO();
-
-		response.setContentType("application/json");
-		response.setCharacterEncoding("utf-8");
-		// 消息提示
-		LayuiData layui = new LayuiData();
-		try {
-			String filepath = path;// 文件路径
-			ReadExcelUtils excelReader = new ReadExcelUtils(filepath);
-
-			// 读取Excel表格内容
-			List<Map<Integer, Object>> list = excelReader.readExcelContent();
-			List<Object> userlist = new ArrayList<Object>();
-
-			for (Map<Integer, Object> map : list) {
-				TUser user = new TUser();
-				for (Map.Entry<Integer, Object> m : map.entrySet()) {
-
-					switch (m.getKey()) {
-					case 0:
-						Integer usertype = null;
-						if (((String) m.getValue()).equals("教师")) {
-							usertype = 1;
-						} else {
-							usertype = 0;
-						}
-						// user.setUsertype(usertype);
-						break;
-					case 1:
-						String userid = (String) m.getValue();
-						user.setUserid((String) new DecimalFormat("#")
-								.format(Double.parseDouble(userid)));
-						break;
-					case 2:
-						user.setUsername((String) m.getValue());
-						break;
-					case 3:
-						// String md5Str = EnCriptUtil.fix(user.getUserid(),
-						// (String) m.getValue());
-						// String endPwd = EnCriptUtil.getEcriptStr(md5Str,
-						// "md5");
-						// user.setPwd(endPwd);
-						break;
-					case 4:
-						Integer regionid = null;
-						// if (user.getUsertype().equals(1)) {
-						// CollegeDAO cdao = DAOFactory.getCollegeDAO();
-						// regionid = cdao.getCollegeid((String) m.getValue());
-						// } else {
-						// ClassesDAO cdao = DAOFactory.getClassesDAO();
-						// regionid = cdao.getclassIdByname((String) m
-						// .getValue());
-						// }
-						// user.setUserregion(regionid);
-						break;
-
-					default:
-						break;
-					}
-				}
-				userlist.add(user);
-
-			}
-			if (udao.insertList(userlist)) {
-				layui.code = 0;
-				layui.msg = "导入成功";
-			} else {
-				layui.code = 1;
-				layui.msg = "导入错误";
-			}
-			Writer out;
-			try {
-				out = response.getWriter();
-				out.write(JSON.toJSONString(layui));
-				out.flush();
-				out.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (FileNotFoundException e) {
-			System.out.println("未找到指定路径的文件!");
-			e.printStackTrace();
-		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
