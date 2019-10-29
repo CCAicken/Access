@@ -32,6 +32,12 @@
 		<mapping resource="model/VRoleSystemModel.hbm.xml" />
 		<mapping resource="model/TSystemModel.hbm.xml" />
 		<mapping resource="model/TSystemLog.hbm.xml" />
+		<mapping resource="model/TButton.hbm.xml" />
+		<mapping resource="model/TTableClumn.hbm.xml" />
+		<mapping resource="model/TRoleButton.hbm.xml" />
+		<mapping resource="model/TRoleClumn.hbm.xml" />
+		<mapping resource="model/VRoleButton.hbm.xml" />
+		<mapping resource="model/VRoleClumn.hbm.xml" />
 
 	</session-factory>
 

@@ -80,8 +80,44 @@
 			<generator class="assigned"></generator>
 		</primary-key>
 	</table>
-<table name="T_SystemLog" schema="dbo" catalog="access"
-	class="model.TSystemLog">
+	<table name="T_SystemLog" schema="dbo" catalog="access"
+		class="model.TSystemLog">
+		<primary-key>
+			<generator class="identity"></generator>
+		</primary-key>
+	</table>
+	<table name="T_Button" schema="dbo" catalog="access"
+		class="model.TButton">
+		<primary-key>
+			<generator class="identity"></generator>
+		</primary-key>
+	</table>
+	<table name="T_TableClumn" schema="dbo" catalog="access"
+		class="model.TTableClumn">
+		<primary-key>
+			<generator class="identity"></generator>
+		</primary-key>
+	</table>
+	<table name="T_RoleButton" schema="dbo" catalog="access"
+		class="model.TRoleButton">
+		<primary-key>
+			<generator class="identity"></generator>
+		</primary-key>
+	</table>
+	<table name="T_RoleClumn" schema="dbo" catalog="access"
+		class="model.TRoleClumn">
+		<primary-key>
+			<generator class="identity"></generator>
+		</primary-key>
+	</table>
+	<table name="V_RoleButton" schema="dbo" catalog="access"
+		class="model.VRoleButton">
+		<primary-key>
+			<generator class="identity"></generator>
+		</primary-key>
+	</table>
+<table name="V_RoleClumn" schema="dbo" catalog="access"
+	class="model.VRoleClumn">
 	<primary-key>
 		<generator class="identity"></generator>
 	</primary-key>
