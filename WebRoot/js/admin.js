@@ -176,8 +176,8 @@
 	});
 });
  
-	$("html").click(function() {
-		$.ajax({
+ 	function check(){
+ 		$.ajax({
 			type: 'get',
 			url: '../checklogin/islogin',
 			data : {
@@ -191,6 +191,12 @@
 				}
 			},
 			error: function() {}
+		});
+ 	}
+ 	$(document).ready(function() {
+		check();
+		$("html").click(function() {
+			check();
 		});
 	});
  

@@ -70,7 +70,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 		}
 
 		// 通过的URL继续访问servlet容器，实现正常的请求
-		filterChain.doFilter(sRequest, sResponse);
+		// filterChain.doFilter(sRequest, sResponse);
 	}
 
 	@Override

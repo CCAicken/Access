@@ -225,7 +225,7 @@ public class AdminUserController extends HttpServlet implements
 		if (loginuser != null) {
 			// session.setAttribute("loginuser", loginuser);
 			service(request);
-			session.setAttribute("loginuser", loginuser);
+			// session.setAttribute("loginuser", loginuser);
 			laydata.code = LayuiData.SUCCESS;
 			laydata.msg = "µÇÂ½³É¹¦";
 		} else {
