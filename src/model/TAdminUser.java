@@ -1,6 +1,5 @@
 package model;
 
-import java.sql.Timestamp;
 
 /**
  * TAdminUser entity. @author MyEclipse Persistence Tools
@@ -16,9 +15,9 @@ public class TAdminUser implements java.io.Serializable {
 	private Integer roleId;
 	private Integer userstatus;
 	private String realname;
-	private Timestamp createtime;
+	private String createtime;
 	private Integer loginstatus;
-	private Timestamp lastlogindate;
+	private String lastlogindate;
 
 	// Constructors
 
@@ -28,7 +27,7 @@ public class TAdminUser implements java.io.Serializable {
 
 	/** minimal constructor */
 	public TAdminUser(String userid, String pwd, Integer roleId,
-			Integer userstatus, String realname, Timestamp createtime) {
+			Integer userstatus, String realname, String createtime) {
 		this.userid = userid;
 		this.pwd = pwd;
 		this.roleId = roleId;
@@ -39,8 +38,8 @@ public class TAdminUser implements java.io.Serializable {
 
 	/** full constructor */
 	public TAdminUser(String userid, String mobile, String pwd, Integer roleId,
-			Integer userstatus, String realname, Timestamp createtime,
-			Integer loginstatus, Timestamp lastlogindate) {
+			Integer userstatus, String realname, String createtime,
+			Integer loginstatus, String lastlogindate) {
 		this.userid = userid;
 		this.mobile = mobile;
 		this.pwd = pwd;
@@ -102,11 +101,11 @@ public class TAdminUser implements java.io.Serializable {
 		this.realname = realname;
 	}
 
-	public Timestamp getCreatetime() {
+	public String getCreatetime() {
 		return this.createtime;
 	}
 
-	public void setCreatetime(Timestamp createtime) {
+	public void setCreatetime(String createtime) {
 		this.createtime = createtime;
 	}
 
@@ -118,11 +117,11 @@ public class TAdminUser implements java.io.Serializable {
 		this.loginstatus = loginstatus;
 	}
 
-	public Timestamp getLastlogindate() {
+	public String getLastlogindate() {
 		return this.lastlogindate;
 	}
 
-	public void setLastlogindate(Timestamp lastlogindate) {
+	public void setLastlogindate(String lastlogindate) {
 		this.lastlogindate = lastlogindate;
 	}
 

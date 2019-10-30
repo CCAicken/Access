@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import model.VAdminUser;
+import model.TAdminUser;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.LayuiData;
 import util.ResponseJSON;
+import business.dao.AdminUserDAO;
 import business.dao.RoleSysModelDAO;
 import business.dao.SystemModelDAO;
 import business.factory.DAOFactory;
@@ -73,9 +74,11 @@ public class SystemModelController {
 	public void getRoleSystemModelList(HttpServletRequest request,
 			HttpServletResponse response, Model model) throws IOException {
 		HttpSession session = request.getSession();
-		VAdminUser loginUser = (VAdminUser) session.getAttribute("loginuser");
+		AdminUserDAO adao = DAOFactory.getAdminUserDAO();
+		TAdminUser loginuser = adao.getuser(session.getAttribute("userid")
+				.toString());
 		SystemModelDAO smdao = DAOFactory.getSystemModelDAO();
-		List list = smdao.getSystemModelByRole(loginUser.getRoleId());
+		List list = smdao.getSystemModelByRole(loginuser.getRoleId());
 		ResponseJSON rj = new ResponseJSON();
 
 		// »Ø´«json×Ö·û´®

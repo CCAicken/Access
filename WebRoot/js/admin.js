@@ -48,6 +48,34 @@
 		error : function() {}
 	});
 	
+//	function check() {
+//		$.ajax({
+//			type : 'Get',
+//			url : 'checklogin/islogin', //请求地址
+//			data : {
+//				action : "check"
+//			},
+//			dataType: 'application/json',
+//
+//			success : function(data) { //请求成功
+//				if (data=="logined") {
+//					alert("您的账号在别处登录，您已被强迫下线");
+//					window.location.href = "login.html";
+//				}
+//			},
+//			error : function(XMLHttpRequest, textStatus) { //请求失败
+//				alert("会话错误，请重新登录");
+//				window.location.href = "login.html";
+//			}
+//		});
+//	}
+//	$(document).ready(function() {
+//		//check();
+//		$("html").click(function() {
+//			check();
+//		});
+//	});
+	
 	//左侧导航菜单的显示和隐藏
 	$('.container .left_open i').click(function(event) {
 		if($('.left-nav').css('left') == '0px') {
@@ -147,3 +175,22 @@
 		FrameWH();
 	});
 });
+ 
+	$("html").click(function() {
+		$.ajax({
+			type: 'get',
+			url: '../checklogin/islogin',
+			data : {
+				action : "check"
+			},
+			datatype: 'json',
+			success: function(data) {
+				if(data.msg!="logined"){
+					alert("您的账号在别处登录，您已被强迫下线");
+					window.location.href = "login.html";
+				}
+			},
+			error: function() {}
+		});
+	});
+ 

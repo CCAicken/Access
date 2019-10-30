@@ -3,11 +3,16 @@ package controller.service;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
 import model.TAdminUser;
 import model.VAdminUser;
@@ -33,7 +38,8 @@ import com.alibaba.fastjson.JSON;
  */
 @Controller
 @RequestMapping(value = "admin")
-public class AdminUserController {
+public class AdminUserController extends HttpServlet implements
+		HttpSessionListener {
 	/**
 	 * 获取管理员用户列表
 	 * 
@@ -87,46 +93,6 @@ public class AdminUserController {
 			e.printStackTrace();
 		}
 		// return "";
-	}
-
-	/**
-	 * 实现一个管理员用户的登陆
-	 * 
-	 * @param user
-	 * @param request
-	 * @param response
-	 * @throws IOException
-	 */
-	@RequestMapping(value = "/adminlogin")
-	public void AdminUserLogin(String userid, String pwd,
-			HttpServletRequest request, HttpServletResponse response,
-			Model model) throws IOException {
-
-		AdminUserDAO audao = DAOFactory.getAdminUserDAO();
-		LayuiData laydata = new LayuiData();
-
-		VAdminUser user = new VAdminUser();
-		user.setUserid((String) userid);
-		user.setPwd(pwd);
-		VAdminUser loginuser = audao.login(user);
-		if (loginuser != null) {
-			HttpSession session = request.getSession();
-			session.setAttribute("loginuser", loginuser);
-			laydata.code = LayuiData.SUCCESS;
-			laydata.msg = "登陆成功";
-		} else {
-			laydata.code = LayuiData.ERRR;
-			laydata.msg = "登陆失败";
-		}
-
-		// 回传json字符串
-		response.setCharacterEncoding("utf-8");
-		response.setContentType("application/json");
-		PrintWriter out = response.getWriter();
-		out.write(JSON.toJSONString(laydata));
-		out.flush();
-		out.close();
-
 	}
 
 	/**
@@ -187,7 +153,6 @@ public class AdminUserController {
 
 		LayuiData laydata = new LayuiData();
 		HttpSession session = request.getSession();
-
 		session.removeAttribute("loginuser");
 		laydata.code = LayuiData.SUCCESS;
 		laydata.msg = "退出成功";
@@ -234,6 +199,101 @@ public class AdminUserController {
 		out.flush();
 		out.close();
 
+	}
+
+	/**
+	 * 实现一个管理员用户的登陆
+	 * 
+	 * @param user
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/adminlogin")
+	public void AdminUserLogin(String userid, String pwd,
+			HttpServletRequest request, HttpServletResponse response,
+			Model model) throws IOException {
+
+		AdminUserDAO audao = DAOFactory.getAdminUserDAO();
+		LayuiData laydata = new LayuiData();
+
+		VAdminUser user = new VAdminUser();
+		user.setUserid((String) userid);
+		user.setPwd(pwd);
+		HttpSession session = request.getSession();
+		VAdminUser loginuser = audao.login(user);
+		if (loginuser != null) {
+			// session.setAttribute("loginuser", loginuser);
+			service(request);
+			session.setAttribute("loginuser", loginuser);
+			laydata.code = LayuiData.SUCCESS;
+			laydata.msg = "登陆成功";
+		} else {
+			laydata.code = LayuiData.ERRR;
+			laydata.msg = "登陆失败";
+		}
+
+		// 回传json字符串
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("application/json");
+		PrintWriter out = response.getWriter();
+		out.write(JSON.toJSONString(laydata));
+		out.flush();
+		out.close();
+
+	}
+
+	public static final Map<String, HttpSession> USER_SESSION = new HashMap<String, HttpSession>();
+	public static final Map<String, String> SESSIONID_USER = new HashMap<String, String>();
+	static boolean loginstate = false;
+
+	private void service(HttpServletRequest request) throws IOException {
+		// 处理用户登录(保持同一时间同一账号只能在一处登录)
+		userLoginHandle(request);
+		// 当前登录的用户
+		String userid = request.getParameter("userid");
+		// System.out.println(userid);
+		HttpSession session = request.getSession();
+		// 添加用户与HttpSession的绑定
+		USER_SESSION.put(userid, session);
+		// 添加sessionId和用户的绑定
+		SESSIONID_USER.put(session.getId(), userid);
+		session.setAttribute("userid", userid);
+		session.removeAttribute("loginstate");
+	}
+
+	private static void userLoginHandle(HttpServletRequest request)
+			throws IOException {
+		// 当前登录的用户
+		String userid = request.getParameter("userid");
+		// 当前sessionId
+		String sessionId = request.getSession().getId();
+		// 删除当前sessionId绑定的用户，用户--HttpSession
+		USER_SESSION.remove(SESSIONID_USER.remove(sessionId));
+
+		// 删除当前登录用户绑定的HttpSession
+		HttpSession session = USER_SESSION.remove(userid);
+		if (session != null) {
+			SESSIONID_USER.remove(session.getId());
+			session.removeAttribute("userid");
+			session.setAttribute("loginstate", "logout");
+		}
+	}
+
+	@Override
+	public void sessionCreated(HttpSessionEvent se) {
+		// TODO Auto-generated method stub
+		String sessionId = se.getSession().getId();
+		// System.out.println(sessionId);
+	}
+
+	@Override
+	public void sessionDestroyed(HttpSessionEvent se) {
+		// TODO Auto-generated method stub
+		String sessionId = se.getSession().getId();
+		// 当前session销毁时删除当前session绑定的用户信息
+		// 同时删除当前session绑定用户的HttpSession
+		USER_SESSION.remove(SESSIONID_USER.remove(sessionId));
 	}
 
 }

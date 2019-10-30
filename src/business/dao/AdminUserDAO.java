@@ -72,4 +72,12 @@ public interface AdminUserDAO {
 	 *            用户id
 	 */
 	public TAdminUser getuser(String userid);
+
+	/**
+	 * 更新管理员用户
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public boolean update(TAdminUser user);
 }

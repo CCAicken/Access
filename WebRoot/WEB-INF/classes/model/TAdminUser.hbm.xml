@@ -25,13 +25,13 @@
         <property name="realname" type="java.lang.String">
             <column name="realname" not-null="true" />
         </property>
-        <property name="createtime" type="java.sql.Timestamp">
+        <property name="createtime" type="java.lang.String">
             <column name="createtime" length="23" not-null="true" />
         </property>
         <property name="loginstatus" type="java.lang.Integer">
             <column name="loginstatus" />
         </property>
-        <property name="lastlogindate" type="java.sql.Timestamp">
+        <property name="lastlogindate" type="java.lang.String">
             <column name="lastlogindate" length="23" />
         </property>
     </class>

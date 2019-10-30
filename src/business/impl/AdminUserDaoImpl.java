@@ -101,4 +101,11 @@ public class AdminUserDaoImpl implements AdminUserDAO {
 		return (TAdminUser) hdao.findById(TAdminUser.class, userid);
 	}
 
+	@Override
+	public boolean update(TAdminUser user) {
+		// TODO Auto-generated method stub
+
+		return hdao.update(user);
+	}
+
 }

@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=utf-8"
+	<%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
 <!doctype html>
 <html lang="en">
@@ -95,8 +95,5 @@
 		<script type="text/javascript" src="../layui/layui.all.js" charset="utf-8"></script>
 		<script type="text/javascript" src="../js/jquery-3.3.1.js" ></script>
 		<script type="text/javascript" src="../js/admin.js" ></script>
-		<script type="text/javascript">
-			
-		</script>
 	</body>
 </html>
