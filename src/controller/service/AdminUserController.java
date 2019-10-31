@@ -256,9 +256,14 @@ public class AdminUserController extends HttpServlet implements
 		HttpSession session = request.getSession();
 		// 添加用户与HttpSession的绑定
 		USER_SESSION.put(userid, session);
+
+		AdminUserDAO adao = DAOFactory.getAdminUserDAO();
+		TAdminUser loginuser = adao.getuser(userid);
+
 		// 添加sessionId和用户的绑定
 		SESSIONID_USER.put(session.getId(), userid);
 		session.setAttribute("userid", userid);
+		session.setAttribute("loginuser", loginuser);
 		session.removeAttribute("loginstate");
 	}
 
@@ -276,6 +281,7 @@ public class AdminUserController extends HttpServlet implements
 		if (session != null) {
 			SESSIONID_USER.remove(session.getId());
 			session.removeAttribute("userid");
+			session.removeAttribute("loginuser");
 			session.setAttribute("loginstate", "logout");
 		}
 	}

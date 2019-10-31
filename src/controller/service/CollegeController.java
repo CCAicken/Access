@@ -6,7 +6,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import model.TAdminUser;
 import model.TCollege;
 
 import org.springframework.stereotype.Controller;
@@ -28,7 +30,9 @@ public class CollegeController {
 	public void getCollegeList(HttpServletRequest request, Integer page,
 			Integer limit, String wherecondition, HttpServletResponse response,
 			Model model) {
-
+		HttpSession session = request.getSession();
+		TAdminUser user = (TAdminUser) session.getAttribute("loginuser");
+		System.out.println(user.getUserid());
 		// ²éÑ¯Ìõ¼þ
 		Expression exp = new Expression();
 

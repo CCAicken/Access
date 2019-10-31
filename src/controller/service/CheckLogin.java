@@ -28,7 +28,7 @@ public class CheckLogin extends HttpServlet {
 			HttpSession session = request.getSession();
 			String loginstate = (String) session.getAttribute("loginstate");
 
-			System.out.println("loginstate:" + loginstate);
+			// System.out.println("loginstate:" + loginstate);
 			if (loginstate == null) {
 				laydata.code = LayuiData.SUCCESS;
 				laydata.msg = "logined";
