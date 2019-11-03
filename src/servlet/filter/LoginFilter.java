@@ -55,7 +55,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 
 			// 需要进行身份验证的URL、请求 则检查是否已登陆
 			// System.out.println("user=" + session.getAttribute("loginuser"));
-			if (session.getAttribute("userid") == null) {
+			if (session.getAttribute("loginuser") == null) {
 				// System.out.println(arg0.getContextPath());
 				response.sendRedirect(request.getContextPath()
 						+ "/html/login.html");

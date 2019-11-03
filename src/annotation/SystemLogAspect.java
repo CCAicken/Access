@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import model.TAdminUser;
 import model.TSystemLog;
-import model.VAdminUser;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -79,7 +79,7 @@ public class SystemLogAspect {
 					.getRequestAttributes()).getRequest();
 			HttpSession session = request.getSession();
 			// 读取session中的管理员用户
-			VAdminUser user = (VAdminUser) session.getAttribute("loginuser");
+			TAdminUser user = (TAdminUser) session.getAttribute("loginuser");
 
 			// 获得方法的参数
 			Object[] args = joinPoint.getArgs();

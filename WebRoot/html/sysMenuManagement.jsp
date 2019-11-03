@@ -126,9 +126,9 @@
 					templet: function(d){
     					if(d.deepth==1){
     						return "一级菜单";
-    					}else if(deepth==2){
+    					}else if(d.deepth==2){
     						return "二级菜单";
-    					}else if(deepth==3){
+    					}else if(d.deepth==3){
     						return "按钮";
     					}
     				}

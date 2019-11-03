@@ -7,15 +7,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import model.VRoleButton;
+import model.VRoleClumn;
+import model.VRoleSystemModel;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import util.layuitree;
+
+import com.alibaba.fastjson.JSON;
 
 public class iHibBaseDAOImpl implements iHibBaseDAO {
 	public static final int INSERT = 1;// 代表添加操作
@@ -770,5 +779,172 @@ public class iHibBaseDAOImpl implements iHibBaseDAO {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override
+	public List<String> getModelName(String sqlstr) {
+		Session session = HibSessionFactory.getSession();
+		List<String> list = new ArrayList<String>();
+		// 将会话session对象转换为jdbc的connection
+		Connection con = session.connection();
+
+		Statement stmt;
+		try {
+			stmt = con.createStatement();
+			String sql = sqlstr;
+			ResultSet rs = stmt.executeQuery(sql);
+			ResultSetMetaData rsmd = rs.getMetaData();
+			// 获取字段名
+
+			// String sName = rsmd.getColumnName(1);
+			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+				// System.out.println(rsmd.getColumnName(i));
+				list.add(rsmd.getColumnName(i));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return list;
+	}
+
+	/**
+	 * 获取权限菜单
+	 * 
+	 * @param roleid
+	 *            角色id
+	 * @return
+	 */
+	public static List<layuitree> getlist(Integer roleid) {
+		iHibBaseDAOImpl bdao = new iHibBaseDAOImpl();
+
+		List<layuitree> tree = new ArrayList<layuitree>();
+
+		// 获取一级菜单
+		List<VRoleSystemModel> sysmodel = (List<VRoleSystemModel>) bdao
+				.select("from VRoleSystemModel where roleid=" + roleid
+						+ " and deepth=1 and isdelete=False");
+		for (VRoleSystemModel sys : sysmodel) {
+			layuitree leve1 = new layuitree();
+			leve1.setId(sys.getSysid());
+			leve1.setName(sys.getChinesename());
+			leve1.setType("other");
+
+			// 获取二级菜单
+			List<VRoleSystemModel> sysmodel2 = (List<VRoleSystemModel>) bdao
+					.select("from VRoleSystemModel where roleid=" + roleid
+							+ " and parentid=" + sys.getSysid()
+							+ " and isdelete=False");
+			List<layuitree> tree2 = new ArrayList<layuitree>();
+
+			for (VRoleSystemModel sys2 : sysmodel2) {
+				layuitree leve2 = new layuitree();
+				leve2.setId(sys2.getSysid());
+				leve2.setName(sys2.getChinesename());
+				leve2.setType("other");
+
+				// // 获取二级菜单的按钮
+				//
+				// // 获取二级菜单的列
+				// List<VRoleClumn> clumns = (List<VRoleClumn>) bdao
+				// .select("from VRoleClumn where sysModleId="
+				// + sys2.getSysid() + " and  roleid=" + roleid);
+
+				List<layuitree> tree3 = new ArrayList<layuitree>();
+				for (int i = 0; i <= 1; i++) {
+					if (i == 0) {
+						layuitree btn = new layuitree();
+						btn.setId(1);
+						btn.setName("按钮");
+						btn.setType("other");
+						List<VRoleButton> buttons = (List<VRoleButton>) bdao
+								.select("from VRoleButton where sysModelId="
+										+ sys2.getSysid() + " and  roleid="
+										+ roleid);
+						if (buttons.size() != 0) {
+							List<layuitree> tree4 = new ArrayList<layuitree>();
+							for (VRoleButton vRoleButton : buttons) {
+								layuitree button = new layuitree();
+								button.setId(vRoleButton.getBtnId());
+								button.setName(vRoleButton.getBtnname());
+								button.setType("button");
+								button.setRelationshipid(vRoleButton.getId());
+								if (vRoleButton.getIsedit()) {
+									button.setSpread(true);
+								}
+								tree4.add(button);
+							}
+
+							btn.setChildren(tree4);
+							tree3.add(btn);
+						}
+
+					} else {
+						layuitree clumn = new layuitree();
+						clumn.setId(2);
+						clumn.setName("列名");
+						clumn.setType("other");
+						List<VRoleClumn> clumns = (List<VRoleClumn>) bdao
+								.select("from VRoleClumn where sysModleId="
+										+ sys2.getSysid() + " and  roleid="
+										+ roleid);
+						if (clumns.size() != 0) {
+							List<layuitree> tree4 = new ArrayList<layuitree>();
+							for (VRoleClumn vRoleClumn : clumns) {
+								layuitree clumn1 = new layuitree();
+								clumn1.setId(vRoleClumn.getClumnId());
+								clumn1.setName(vRoleClumn.getClumnName());
+								clumn1.setType("clumn");
+								clumn1.setRelationshipid(vRoleClumn.getId());
+								if (vRoleClumn.getIsedit()) {
+									clumn1.setSpread(true);
+								}
+								tree4.add(clumn1);
+							}
+							clumn.setChildren(tree4);
+							tree3.add(clumn);
+						}
+					}
+				}
+
+				leve2.setChildren(tree3);
+				tree2.add(leve2);
+
+			}
+			leve1.setChildren(tree2);
+			tree.add(leve1);
+
+		}
+
+		return tree;
+	}
+
+	public static void main(String args[]) {
+		layuitree laytree = new layuitree();
+		laytree.setId(1);
+		laytree.setSpread(true);
+		laytree.setName("cesss");
+		laytree.setType("other");
+		String dddString = JSON.toJSONString(laytree);
+		String dddd = "[{'id':1,'name':'cesss','type':'other'},{'id':1,'name':'aaaa','type':'other'}]";
+		List<layuitree> treebtns = JSON.parseArray(dddd, layuitree.class);
+		for (layuitree layuitree : treebtns) {
+			System.out.println(layuitree.getName());
+		}
+
+	}
+
+	public static layuitree findChildren(layuitree menu,
+			List<layuitree> menuList) {
+		for (layuitree layuitree : menuList) {
+			if (menu.getId().equals(layuitree.getId())) {
+				if (menu.getChildren() == null) {
+					menu.setChildren(new ArrayList<layuitree>());
+				}
+				menu.getChildren().add(findChildren(layuitree, menuList));
+			}
+		}
+		return menu;
 	}
 }

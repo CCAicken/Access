@@ -375,4 +375,32 @@ function loadSport(selectId,type, form){
 	
 }
 
+function loadmajoridSelected(selectId,majorid, form){
+	var reqType = 'post';
+	var reqURL = '../select/selectmajor'; 
+	var reqPara = {};
+	var stageData = callAJAX(reqType, reqURL, reqPara);  
+	if(stageData != '' && stageData != undefined) { 
+		if(stageData.code == 0) {
+			$('#' + selectId).html(""); //获取id为selectId指定的控件内容
+			var str = "<option value=''>请选择专业</option>";
+			for(var i = 0; i < stageData.data.length; i++) {
+				if(majorid==stageData.data[i]['majorid'])
+				{
+						str += '<option value=' + stageData.data[i]['majorid'] + " selected='selected'"+'>' + stageData.data[i]['majorname'] + '</option>';
+				}else{
+						str += '<option value=' + stageData.data[i]['majorid'] + '>' + stageData.data[i]['majorname'] + '</option>';
+				}	
+			}
+			$('#' + selectId).append(str);
+			form.render("select");
+		} else {
+			//layer.msg("未获取到阶段信息！");
+			layer.msg('未获取到信息', function(){});
+		}
+	} else {
+		//layer.msg("阶段信息获取失败！");
+		layer.msg('未获取到信息', function(){});
+	}
+}
 

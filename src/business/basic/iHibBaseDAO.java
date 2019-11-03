@@ -269,4 +269,14 @@ public interface iHibBaseDAO {
 	 * @return List 失败返回null
 	 */
 	public List selectBysql(String sql);
+
+	/**
+	 * 获取表的列名
+	 * 
+	 * @param sqlstr
+	 *            sql语句 例如 select * from T_User返回所有列名;select useid,username from
+	 *            T_User 返回userid，username
+	 * @return 列名数组
+	 */
+	public List<String> getModelName(String sqlstr);
 }

@@ -121,7 +121,7 @@
 			<div class="layui-form-item">
 				<label class="layui-form-label">角色新名称:</label>
 				<div class="layui-input-inline">
-					<input type="text" id="newmajorname" placeholder="请输入学院新名称"
+					<input type="text" id="newmajorname" placeholder="请输入新名称"
 						autocomplete="off" class="layui-input">
 				</div>
 			</div>

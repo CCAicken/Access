@@ -21,7 +21,7 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
 
   <div class="layui-fluid" style="margin-top: 10px">
     		<blockquote class="layui-elem-quote" style="border-left: none">
-			<form class="layui-form">
+			<form class="layui-form" id="se_from">
 				<div class="layui-inline">
 					<select id="collegeselect" lay-filter="college">
 						<option value="">请选择学院</option>
@@ -39,9 +39,7 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
 					<button id="btnselfrontinfo" type="button"
 						class="layui-btn layui-bg-blue">查询</button>
 				</div>
-				<div  class="layui-inline">
-          			<button class="layui-btn layuiadmin-btn-useradmin" type="button" id="btn_addcollege">添加</button>
-        		</div>
+				
 			</form>
 		</blockquote>
       
@@ -53,33 +51,22 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
           <img style="display: inline-block; width: 50%; height: 100%;" src= {{ d.avatar }}>
         </script> 
         <script type="text/html" id="barDemo">
-          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
-          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+         
         </script>
       </div>
     </div>
 
   <script src="../js/jquery-3.3.1.js" charset="utf-8"></script>
+  <script src="../js/jquery-1.4.4.js" charset="utf-8"></script>
 	<script src="../js/loadselect.js" charset="utf-8"></script>
 	<script src="../layui/layui.js" charset="utf-8"></script>
+	<script src="../js/access.js" charset="utf-8"></script>
+	
   <script>
   	layui.use(['layer','upload','table'], function(){
   		var layer = layui.layer,$=layui.jquery,upload = layui.upload,table=layui.table,form=layui.form;
-  		
-  		//加载学院、专业下拉框信息
-  		loadSelect("college","collegeselect", form); 
-  		loadSelect("major","majorselect", form); 
-  		
-  		/*加载表格*/
-		table.render({
-			elem : '#classlist',
-			id:'classlist',
-			url : '../classes/getclasses',
-			title : '班级数据表',
-			height: "full-160",
-			//skin : 'line',
-			even : true,
-			cols : [ 
+		//alert(sessionStorage.getItem("sysid")); 
+		var allcols=
 			     [ {
 					type : 'numbers',
 					title : '序号',
@@ -101,10 +88,31 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
      				title : '班级名称',
    
     			},{
+    				field:'tool',
 					title : '操作',
 					toolbar : '#barDemo',
 					align : 'center'
-				}] ],
+				}] ;
+		
+		//var arr= getCompClos().data;
+		//处理表头，根据权限去掉相关列
+   		//var arr=["collegename","classname","majorname"];
+   		//var btns= getCompClos().data1;
+   		
+  		//加载学院、专业下拉框信息
+  		loadSelect("college","collegeselect", form); 
+  		loadSelect("major","majorselect", form); 
+  		
+  		/*加载表格*/
+		table.render({
+			elem : '#classlist',
+			id:'classlist',
+			url : '../classes/getclasses',
+			title : '班级数据表',
+			height: "full-160",
+			//skin : 'line',
+			even : true,
+			cols : [returnNewCols(allcols,getCompClos().data,getCompClos().data1)],
 			 page: {
 					layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'],
 					groups: 5,
@@ -217,7 +225,9 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
 					});
 				break;
 				case 'edit':
-					$("#oldcollegename").val(data.collegename);
+				//alert(data.collegename);
+					$("#oldcollegename").val(data.classname);
+					loadmajoridSelected("newcollegeid",data.majorid,form);
 					layer.open({
   						title:"班级信息编辑",
   						type: 1,
@@ -230,11 +240,12 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
   						btn1: function(index, layero){
     						$.ajax({
 			        		type: 'get',
-			        		url: "../college/edcollege",
+			        		url: "../classes/edclasses",
 			        		dataType: 'json',
 			        		data:{
-			        		collegeid:data.collegeid,
-			        		 collegename:$("#newcollegename").val().trim()
+			        			majorid:$("#newcollegeid").val(),
+								classid:data.classid, 
+							    classname:$("#newcollegename").val().trim()
 			        		},
 			        		success:function(data){
 			        			if(data.code == 0){
@@ -242,7 +253,7 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
 			        				icon: 1,
 									  btn: ['确定']
 									}, function(){
-										table.reload("collegelist", { //此处是上文提到的 初始化标识id
+										table.reload("classlist", { //此处是上文提到的 初始化标识id
 							                where: {
 							                	
 							                },page: {
@@ -275,66 +286,7 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
 				break;
 			};
 		});
-  		//导入按钮事件
-  		$("#btn_importcollege").click(function(){
-  			layer.open({
-  				title:"班级信息导入",
-  				type: 1,
-  				area: ['500px', '400px'],
-  				skin: 'demo-class',
-  				maxmin: true,//显示最大化最小化按钮
-  				//offset: 'b', 弹框的位置
-  				content: $('#div_import'),
-  				
-  				cancel: function(){ 
-  					
-  				}
-			});
-  		})
-  		
-  		//确认导入按钮
-		$("#btn_import").click(function(){
-		
-			if($("#btn_import").val()==null || $("#btn_import").val()==""){
-				layer.msg("请先选择文件");
-				return;
-			}
-			$.ajax({
-				type:"GET",
-        		url:"../classes/addclasseslist",
-        		dataType:"json",
-				data:{
-					path:$("#btn_import").val()
-				},beforeSend: function(){
-        			layer.load();
-    			},
-        		success:function(data){
- 					layer.closeAll('loading'); //关闭loading
-           			if(data.code==0){
-						layer.confirm(data.msg, { icon: 1, btn: ['确定'] },
-				 		function(){
-							table.reload("majorlist", { //此处是上文提到的 初始化标识id
-							      where: {
-							        },
-							        page: {
-							          curr:1
-							        }
-							        })
-							 layer.closeAll();
-						})
-							
-						
-           			}else{
-              			layer.confirm(data.msg, { icon: 7,  btn: ['确定'] });
-          			 }
-        		},
-       			 error:function(jqXHR){
- 					layer.closeAll('loading'); //关闭loading
- 					layer.msg("发生错误："+ jqXHR.status);
-        		}
-			})
-		});
-  		
+  	
   		//添加班级按钮事件
   		$("#btn_addcollege").click(function(){
   		
@@ -396,50 +348,9 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
   				}
 			});
   		})
-		//执行实例
-		var uploadInst = upload.render({
-			elem : '#upfile' //绑定元素
-			,//auto: false, //不自动上传
-			url : '../file/springimport', //上传接口
-			//bindAction:'#btn_upload',
-			//accept : 'file'//上传所有格式文件,
-			exts : 'xls|xlsx',
-			choose: function(obj) {
-					obj.preview(function(index, file, result) {
-							$("#filename").text('您的文件名是:'+file.name);
-					});
-				},
-			done: function(res, index, upload){
-    			//code=0代表上传成功
-    			if(res.code == 0){
-      				//layer.msg(res.msg);
-					$("#btn_import").val(res.msg);
-    			}else
-    			{
-    				layer.confirm(res.msg, { icon: 7,  btn: ['确定'] });
-    			}
-    
-  			}
-  			});
+	
 	}); 
   </script>
-  <!--文件导入div  -->
-	<div id="div_import" style="display: none;text-align: center;">
-	<form class="layui-form" action="">
-			<div class="layui-form-item">
-				<div class="layui-upload-drag" id="upfile" style="margin: 30px;">
-					<i class="layui-icon"></i>
-					<p id="filename">点击选择文件，或将文件拖拽到此处</p>
-				</div>
-			</div>
-			<div class="layui-form-item">
-				<button class="layui-btn layuiadmin-btn-useradmin" type="button"
-					id="btn_import">确认导入</button>
-				<a href="../upload/download/班级模版.xlsx"><button
-						class="layui-btn layuiadmin-btn-useradmin" type="button">下载模版</button></a>
-			</div>
-		</form>
-	</div>
 	 <!--班级添加div  -->
 	<div id="div_addcollege"
 		style="display: none;text-align: center; margin-top: 15%;">
@@ -473,19 +384,29 @@ body .demo-class .layui-layer-page .layui-layer-content {background-color: #e13e
 	 <!--班级编辑div  -->
 	<div id="div_editcollege"
 		style="display: none;text-align: center; margin-top: 15%;">
+		<form class="layui-form" action=""  lay-filter="addform">
 		<div class="layui-form-item">
-			<label class="layui-form-label">学院原名称:</label>
+			<label class="layui-form-label">班级原名称:</label>
 			<div class="layui-input-inline">
-				<input type="text" name="title" disabled="disabled" autocomplete="off" class="layui-input layui-btn-disabled">
+				<input id="oldcollegename" type="text" name="title" disabled="disabled" autocomplete="off" class="layui-input layui-btn-disabled">
 			</div>
 		</div>
 		<div class="layui-form-item">
-			<label class="layui-form-label">学院新名称:</label>
+			<label class="layui-form-label">专业:</label>
 			<div class="layui-input-inline">
-				<input type="text" name="title" 
-					placeholder="请输入学院新名称" autocomplete="off" class="layui-input">
+				<select id="newcollegeid" lay-filter="major">
+						<option value="">请选择专业</option>
+					</select>
+			</div>
+		</div> 
+		<div class="layui-form-item">
+			<label class="layui-form-label">班级新名称:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="title"  id="newcollegename"
+					placeholder="请输入新名称" autocomplete="off" class="layui-input">
 			</div>
 		</div>
+		</form>
 	</div>
 </body>
 		   
